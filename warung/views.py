@@ -48,6 +48,23 @@ def StockerViews(request):
             return JsonResponse(querySerializer.data, status=status.HTTP_201_CREATED)
         return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
 
+@api_view(['GET', 'PUT', 'DELETE'])
+def StockerDetailViews(request, id):
+    query = Stocker.objects.get(id)
+    if request.method == 'GET':
+        querySerializer = StockerSerializer(query, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'PUT':
+        querySerializer = StockerSerializer(query, data=request.data)
+        if querySerializer.is_valid():
+            querySerializer.save()
+            return JsonResponse(querySerializer.data, safe=False)
+        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        query.delete()
+        querySerializer = StockerSerializer(query, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+
 @api_view(['GET', 'POST'])
 def CategoryViews(request):
     query = Category.objects.all()
@@ -62,7 +79,7 @@ def CategoryViews(request):
         return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def CategoryDetailView(request, id):
+def CategoryDetailViews(request, id):
     query = Category.objects.get(id=id)
     if request.method == 'PUT':
         serializer_data = CategorySerializer(query, data= request.data)
@@ -77,21 +94,8 @@ def CategoryDetailView(request, id):
     elif request.method == 'GET':
         serializer_data = CategorySerializer(query, many=True)
         return JsonResponse(serializer_data.data)
-        
-@api_view(['GET', 'POST'])
-def CategoryViews(request):
-    query = Category.objects.all()
-    if request.method == 'GET':
-        querySerializer = CategorySerializer(query, many=True)
-        return JsonResponse(querySerializer.data)
-    elif request.method == 'POST':
-        querySerializer = CategorySerializer(data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
 
-@api_view(['GET', 'POST', 'PUT'])
+@api_view(['GET', 'POST'])
 def GoodsViews(request):
     query = Goods.objects.all()
     if request.method == 'GET':
@@ -103,3 +107,19 @@ def GoodsViews(request):
             querySerializer.save()
             return JsonResponse(querySerializer.data, status=status.HTTP_201_CREATED)
         return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def GoodsDetailViews(request, id):
+    query = Goods.objects.get(id=id)
+    if request.method == 'GET':
+        querySerializer = GoodsSerializer(query, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'PUT':
+        querySerializer = GoodsSerializer(query, data = request.data)
+        if querySerializer.is_valid():
+            querySerializer.save()
+            return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'DELETE':
+        query.delete()
+        serializer_data = GoodsSerializer(Goods.objects.all(), many=True)
+        return JsonResponse(serializer_data.data, safe=False)
