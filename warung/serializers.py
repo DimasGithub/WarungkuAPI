@@ -1,5 +1,6 @@
+from django.db.models import fields
 from rest_framework import serializers
-from warung.models import BioToko, Stocker, Category, Goods
+from warung.models import BioToko, Stocker, Category, Goods, Deposit
 
 class BioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,4 +17,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class GoodsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goods
+        fields = '__all__'
+class DepositSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deposit
         fields = '__all__'
