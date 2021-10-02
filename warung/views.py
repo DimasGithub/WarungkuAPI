@@ -5,8 +5,8 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from warung import serializers
-from warung.models import BioToko, Stocker, Category, Goods, Deposit
-from warung.serializers import BioSerializer, StockerSerializer, CategorySerializer, GoodsSerializer, DepositSerializer
+from warung.models import BioToko, Stocker, Category, Goods, Deposit, Sold, Debt
+from warung.serializers import BioSerializer, StockerSerializer, CategorySerializer, GoodsSerializer, DepositSerializer, SoldSerializer, DebtSerializer
 from rest_framework.decorators import api_view
 
 @api_view(['GET', 'POST'])
@@ -156,4 +156,66 @@ def DepositDetailViews(request, id):
     elif request.method == 'DELETE':
         query.delete()
         serializer_data = DepositSerializer(Deposit.objects.all(), many=True)
+        return JsonResponse(serializer_data.data, safe=False)
+
+@api_view(['GET', 'POST'])
+def SoldViews(request):
+    query = Sold.objects.all()
+    if request.method == 'GET':
+        querySerializer = SoldSerializer(query, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'POST':
+        querySerializer = SoldSerializer(data=request.data)
+        if querySerializer.is_valid():
+            querySerializer.save()
+            return JsonResponse(querySerializer.data, safe=False, status=status.HTTP_201_CREATED)
+        return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def SoldDetailViews(request, id):
+    query = Sold.objects.get(id=id)
+    query2 = Sold.objects.filter(id=id)
+    if request.method == 'GET':
+        querySerializer = SoldSerializer(query2, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'PUT':
+        querySerializer = SoldSerializer(query, data=request.data)
+        if querySerializer.is_valid():
+            querySerializer.save()
+            return JsonResponse(querySerializer.data, safe=False)
+        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        query.delete()
+        serializer_data = SoldSerializer(Sold.objects.all(), many=True)
+        return JsonResponse(serializer_data.data, safe=False)
+
+@api_view(['GET', 'POST'])
+def DebtViews(request):
+    query = Debt.objects.all()
+    if request.method == 'GET':
+        querySerializer = DebtSerializer(query, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'POST':
+        querySerializer = DebtSerializer(data=request.data)
+        if querySerializer.is_valid():
+            querySerializer.save()
+            return JsonResponse(querySerializer.data, safe=False, status=status.HTTP_201_CREATED)
+        return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def DebtDetailViews(request, id):
+    query = Debt.objects.get(id=id)
+    query2 = Debt.objects.filter(id=id)
+    if request.method == 'GET':
+        querySerializer = DebtSerializer(query2, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'PUT':
+        querySerializer = DebtSerializer(query, data=request.data)
+        if querySerializer.is_valid():
+            querySerializer.save()
+            return JsonResponse(querySerializer.data, safe=False)
+        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        query.delete()
+        serializer_data = DebtSerializer(Debt.objects.all(), many=True)
         return JsonResponse(serializer_data.data, safe=False)

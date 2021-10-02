@@ -13,4 +13,8 @@ urlpatterns = [
     path('barang/<int:id>', views.GoodsDetailViews, name='detailBarang'),
     path('titip/', views.DepositViews, name= 'titip'),
     path('titip/<int:id>', views.DepositDetailViews, name='detailTitip'),
+    path('terjual/', views.SoldViews, name='terjual'),
+    path('terjual/<int:id>', views.SoldDetailViews, name='detailTerjual'),
+    path('hutang', views.DebtViews, name='hutang'),
+    path('hutang/<int:id>', views.DebtDetailViews, name='detailHutuang'),
 ]
