@@ -139,3 +139,21 @@ def DepositViews(request):
             querySerializer.save()
             return JsonResponse(querySerializer.data, safe=False, status=status.HTTP_201_CREATED)
         return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def DepositDetailViews(request, id):
+    query = Deposit.objects.get(id=id)
+    query2 = Deposit.objects.filter(id=id)
+    if request.method == 'GET':
+        querySerializer = DepositSerializer(query2, many=True)
+        return JsonResponse(querySerializer.data, safe=False)
+    elif request.method == 'PUT':
+        querySerializer = DepositSerializer(query, data=request.data)
+        if querySerializer.is_valid():
+            querySerializer.save()
+            return JsonResponse(querySerializer.data, safe=False)
+        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        query.delete()
+        serializer_data = DepositSerializer(Deposit.objects.all(), many=True)
+        return JsonResponse(serializer_data.data, safe=False)

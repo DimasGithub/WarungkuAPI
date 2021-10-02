@@ -12,4 +12,5 @@ urlpatterns = [
     path('barang/', views.GoodsViews, name='barang'),
     path('barang/<int:id>', views.GoodsDetailViews, name='detailBarang'),
     path('titip/', views.DepositViews, name= 'titip'),
+    path('titip/<int:id>', views.DepositDetailViews, name='detailTitip'),
 ]
