@@ -6,18 +6,23 @@ class BioSerializer(serializers.ModelSerializer):
     class Meta:
         model = BioToko
         fields = '__all__'
+
 class StockerSerializer(serializers.ModelSerializer):
     class Meta:
         model= Stocker
         fields= '__all__'
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
+
 class GoodsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goods
         fields = '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+    dataku = GoodsSerializer(many=True)
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'dataku']
+
 class DepositSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deposit

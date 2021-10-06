@@ -19,16 +19,18 @@ class Stocker(models.Model):
         return self.name
 class Goods(models.Model):
     name = models.CharField(max_length=70, blank=False)
-    qty = models.IntegerField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    qty = models.IntegerField(default=0)
+    category = models.ForeignKey(Category, related_name='dataku', on_delete=models.CASCADE)
     purchase_price = models.IntegerField()
     purchase_perqty = models.IntegerField()
     billing_prince = models.IntegerField()
     purchase_date = models.DateField()
+    item_sold = models.IntegerField(default=0)
     stocker_name = models.ForeignKey(Stocker, on_delete=models.CASCADE)
     def __str__(self):
         return self.name
     def save(self, *args, **kwargs):
+        self.qty = self.qty - self.item_sold
         self.purchase_perqty = self.purchase_price / self.qty
         super(Goods, self).save(*args, **kwargs)
 
@@ -54,7 +56,6 @@ class Sold(models.Model):
     def __str__(self):
         return self.name_sold.qty
     def save(self, *args, **kwargs):
-        self.name_sold.qty  = self.name_sold.qty - self.qty
         self.total_sold = self.name_sold.billing_prince * self.qty
         super(Sold, self).save(*args, **kwargs)
 

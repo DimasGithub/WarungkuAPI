@@ -8,6 +8,7 @@ from warung import serializers
 from warung.models import BioToko, Stocker, Category, Goods, Deposit, Sold, Debt
 from warung.serializers import BioSerializer, StockerSerializer, CategorySerializer, GoodsSerializer, DepositSerializer, SoldSerializer, DebtSerializer
 from rest_framework.decorators import api_view
+from django.core.exceptions import ObjectDoesNotExist
 
 @api_view(['GET', 'POST'])
 def warungView(request):
@@ -67,7 +68,7 @@ def StockerDetailViews(request, id):
         return JsonResponse(querySerializer.data, safe=False)
 
 @api_view(['GET', 'POST'])
-def CategoryViews(request):
+def CategoryViews(request, id):
     query = Category.objects.all()
     if request.method == 'GET':
         querySerializer = CategorySerializer(query, many=True)
@@ -158,36 +159,40 @@ def DepositDetailViews(request, id):
         serializer_data = DepositSerializer(Deposit.objects.all(), many=True)
         return JsonResponse(serializer_data.data, safe=False)
 
-@api_view(['GET', 'POST'])
-def SoldViews(request):
-    query = Sold.objects.all()
+@api_view(['GET', 'POST', 'PUT'])
+def SoldViews(request, id):
+    query = Goods.objects.get(id=id)
+    query2 = Goods.objects.filter(id=id)
     if request.method == 'GET':
-        querySerializer = SoldSerializer(query, many=True)
+        querySerializer = GoodsSerializer(query2, many=True)
         return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'POST':
-        querySerializer = SoldSerializer(data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, safe=False, status=status.HTTP_201_CREATED)
-        return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
+    if request.method == 'PUT':
+        try:
+            querySerializer = GoodsSerializer(query2, many=True)
+            cek_barang = Goods.objects.get(id=id)
+            querySerializer = GoodsSerializer(query, data = request.data)
+            if querySerializer.is_valid():
+                querySerializer.save()
+                return JsonResponse(querySerializer.data, safe=False)
+            return JsonResponse(querySerializer.errors, safe=False)
+        except cek_barang.ObjectDoesNotExist:
+            return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def SoldDetailViews(request, id):
-    query = Sold.objects.get(id=id)
-    query2 = Sold.objects.filter(id=id)
-    if request.method == 'GET':
-        querySerializer = SoldSerializer(query2, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'PUT':
-        querySerializer = SoldSerializer(query, data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, safe=False)
-        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        query.delete()
-        serializer_data = SoldSerializer(Sold.objects.all(), many=True)
-        return JsonResponse(serializer_data.data, safe=False)
+        
+    # query = Sold.objects.all()
+    # querydata = Goods.objects.all()
+    # if request.method == 'GET':
+    #     querySerializer = SoldSerializer(query, many=True)
+    #     return JsonResponse(querySerializer.data, safe=False)
+    # elif request.method == 'POST':
+    #     querySerializer = SoldSerializer(data=request.data)
+    #     if querySerializer.is_valid():
+    #         querydata.qty = querydata.qty - request.data.qty
+    #         querydata.save()            
+    #         querySerializer.save()
+    #         return JsonResponse(querySerializer.data, safe=False, status=status.HTTP_201_CREATED)
+    #     return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
+
 
 @api_view(['GET', 'POST'])
 def DebtViews(request):
