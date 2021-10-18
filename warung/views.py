@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-# Create your views here.
 from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from warung import serializers
-from warung.models import BioToko, Stocker, Category, Goods, Deposit, Sold, Debt
-from warung.serializers import BioSerializer, StockerSerializer, CategorySerializer, GoodsSerializer, DepositSerializer, SoldSerializer, DebtSerializer
+from warung.models import BioToko, Category, good
+from warung.serializers import BioSerializer, CategorySerializer, GoodsSerializer
 from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 
 @api_view(['GET', 'POST'])
 def warungView(request):
@@ -35,37 +36,6 @@ def warungDetail(request, id):
     elif request.method == 'GET':
         dataku = BioSerializer(data, many=True)
         return Response(dataku.data)
-
-@api_view(['GET', 'POST'])
-def StockerViews(request):
-    query = Stocker.objects.all()
-    if request.method == 'GET':
-        querySerializer = StockerSerializer(query, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'POST':
-        querySerializer = StockerSerializer(data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def StockerDetailViews(request, id):
-    query = Stocker.objects.get(id=id)
-    query2 = Stocker.objects.filter(id=id)
-    if request.method == 'GET':
-        querySerializer = StockerSerializer(query2, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'PUT':
-        querySerializer = StockerSerializer(query, data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, safe=False)
-        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        query.delete()
-        querySerializer = StockerSerializer(query, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
 
 @api_view(['GET', 'POST'])
 def CategoryViews(request, id):
@@ -95,12 +65,14 @@ def CategoryDetailViews(request, id):
         serializer_data = CategorySerializer(Category.objects.all(), many=True) 
         return JsonResponse(serializer_data.data, safe=False)
     elif request.method == 'GET':
+
+        print(query)
         serializer_data = CategorySerializer(query2, many=True)
         return JsonResponse(serializer_data.data, safe=False)
 
 @api_view(['GET', 'POST'])
 def GoodsViews(request):
-    query = Goods.objects.all()
+    query = good.objects.all()
     if request.method == 'GET':
         querySerializer = GoodsSerializer(query, many=True)
         return JsonResponse(querySerializer.data, safe=False)
@@ -113,8 +85,8 @@ def GoodsViews(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def GoodsDetailViews(request, id):
-    query = Goods.objects.get(id=id)
-    query2 = Goods.objects.filter(id=id)
+    query = good.objects.get(id=id)
+    query2 = good.objects.filter(id=id)
     if request.method == 'GET':
         querySerializer = GoodsSerializer(query2, many=True)
         return JsonResponse(querySerializer.data, safe=False)
@@ -125,62 +97,40 @@ def GoodsDetailViews(request, id):
             return JsonResponse(querySerializer.data, safe=False)
     elif request.method == 'DELETE':
         query.delete()
-        serializer_data = GoodsSerializer(Goods.objects.all(), many=True)
+        serializer_data = GoodsSerializer(good.objects.all(), many=True)
         return JsonResponse(serializer_data.data, safe=False)
 
-@api_view(['GET', 'POST'])
-def DepositViews(request):
-    query = Deposit.objects.all()
-    if request.method == 'GET':
-        querySerializer = DepositSerializer(query, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'POST':
-        querySerializer = DepositSerializer(data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, safe=False, status=status.HTTP_201_CREATED)
-        return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def DepositDetailViews(request, id):
-    query = Deposit.objects.get(id=id)
-    query2 = Deposit.objects.filter(id=id)
-    if request.method == 'GET':
-        querySerializer = DepositSerializer(query2, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'PUT':
-        querySerializer = DepositSerializer(query, data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, safe=False)
-        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        query.delete()
-        serializer_data = DepositSerializer(Deposit.objects.all(), many=True)
-        return JsonResponse(serializer_data.data, safe=False)
 
-@api_view(['GET', 'POST', 'PUT'])
+@api_view(['GET', 'PUT'])
 def SoldViews(request, id):
-    query = Goods.objects.get(id=id)
-    query2 = Goods.objects.filter(id=id)
+    query = good.objects.get(id=id)
+    query2 = good.objects.filter(id=id)
     if request.method == 'GET':
+        try:
+            print(query)
+            querySerializer = GoodsSerializer(query2, many=True)
+            return JsonResponse(querySerializer.data, safe=False)
+        except good.ObjectDoesNotExist:
+            print(query)
+            cekBarang = None
         querySerializer = GoodsSerializer(query2, many=True)
         return JsonResponse(querySerializer.data, safe=False)
     if request.method == 'PUT':
         try:
-            querySerializer = GoodsSerializer(query2, many=True)
-            cek_barang = Goods.objects.get(id=id)
-            querySerializer = GoodsSerializer(query, data = request.data)
+            cekBarang = good.objects.get(id=id)
+            querySerializer = GoodsSerializer(cekBarang, data = request.data)
+            print(cekBarang)
             if querySerializer.is_valid():
                 querySerializer.save()
                 return JsonResponse(querySerializer.data, safe=False)
             return JsonResponse(querySerializer.errors, safe=False)
-        except cek_barang.ObjectDoesNotExist:
-            return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
-
-        
+        except cekBarang.DoesNotExist:
+            print(cekBarang)
+            querySerializer = GoodsSerializer(cekBarang, data = request.data)
+       
     # query = Sold.objects.all()
-    # querydata = Goods.objects.all()
+    # querydata = good.objects.all()
     # if request.method == 'GET':
     #     querySerializer = SoldSerializer(query, many=True)
     #     return JsonResponse(querySerializer.data, safe=False)
@@ -194,33 +144,3 @@ def SoldViews(request, id):
     #     return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
 
 
-@api_view(['GET', 'POST'])
-def DebtViews(request):
-    query = Debt.objects.all()
-    if request.method == 'GET':
-        querySerializer = DebtSerializer(query, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'POST':
-        querySerializer = DebtSerializer(data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, safe=False, status=status.HTTP_201_CREATED)
-        return JsonResponse(querySerializer.errors, status = status.HTTP_404_BAD_REQUEST)
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def DebtDetailViews(request, id):
-    query = Debt.objects.get(id=id)
-    query2 = Debt.objects.filter(id=id)
-    if request.method == 'GET':
-        querySerializer = DebtSerializer(query2, many=True)
-        return JsonResponse(querySerializer.data, safe=False)
-    elif request.method == 'PUT':
-        querySerializer = DebtSerializer(query, data=request.data)
-        if querySerializer.is_valid():
-            querySerializer.save()
-            return JsonResponse(querySerializer.data, safe=False)
-        return JsonResponse(querySerializer.errors, status=status.HTTP_404_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        query.delete()
-        serializer_data = DebtSerializer(Debt.objects.all(), many=True)
-        return JsonResponse(serializer_data.data, safe=False)

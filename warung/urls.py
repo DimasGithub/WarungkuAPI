@@ -1,19 +1,23 @@
 
 from django.contrib import admin
 from django.urls import path, include
-from warung import views
+from warung.views import warungView, warungDetail, CategoryDetailViews, CategoryViews, GoodsViews, GoodsDetailViews, SoldViews
+from debt.views import DebtViews, DebtDetailViews
+from deposit.views import DepositDetailViews, DepositViews
+from stocker.views import StockerViews, StockerDetailViews
+from debt.views import DebtViews
 urlpatterns = [
-    path('warung/', views.warungView, name='indexToko'),
-    path('warung/<int:id>', views.warungDetail, name='detailToko'),
-    path('kategori/', views.CategoryViews, name='kategori'),
-    path('kategori/<int:id>', views.CategoryDetailViews, name='detailKategori'),
-    path('stocker/', views.StockerViews, name='stocker'),
-    path('stocker/<int:id>', views.StockerDetailViews, name='detailStocker'),
-    path('barang/', views.GoodsViews, name='barang'),
-    path('barang/<int:id>', views.GoodsDetailViews, name='detailBarang'),
-    path('titip/', views.DepositViews, name= 'titip'),
-    path('titip/<int:id>', views.DepositDetailViews, name='detailTitip'),
-    path('terjual/<int:id>', views.SoldViews, name='terjual'),
-    path('hutang', views.DebtViews, name='hutang'),
-    path('hutang/<int:id>', views.DebtDetailViews, name='detailHutuang'),
+    path('warung/', warungView, name='indexToko'),
+    path('warung/<int:id>', warungDetail, name='detailToko'),
+    path('kategori/', CategoryViews, name='kategori'),
+    path('kategori/<int:id>', CategoryDetailViews, name='detailKategori'),
+    path('stocker/', StockerViews, name='stocker'),
+    path('stocker/<int:id>', StockerDetailViews, name='detailStocker'),
+    path('barang/', GoodsViews, name='barang'),
+    path('barang/<int:id>', GoodsDetailViews, name='detailBarang'),
+    path('titip/', DepositViews, name= 'titip'),
+    path('titip/<int:id>', DepositDetailViews, name='detailTitip'),
+    path('terjual/<int:id>', SoldViews, name='terjual'),
+    path('hutang', DebtViews, name='hutang'),
+    path('hutang/<int:id>', DebtDetailViews, name='detailHutuang'),
 ]

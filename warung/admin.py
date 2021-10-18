@@ -1,11 +1,10 @@
 from django.contrib import admin
-from warung.models import BioToko, Category, Stocker, Goods, Deposit, Sold, Debt
+from warung.models import BioToko, Category, Stocker, good
+from deposit.models import Deposit
 
 admin.site.register(BioToko)
 admin.site.register(Category)
 admin.site.register(Stocker)
-admin.site.register(Goods)
+admin.site.register(good)
 admin.site.register(Deposit)
-admin.site.register(Sold)
-admin.site.register(Debt)
 # Register your models here.
